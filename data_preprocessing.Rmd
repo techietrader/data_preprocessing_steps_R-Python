@@ -1,0 +1,101 @@
+---
+title: "Data_Preprocessing"
+author: "techietrader"
+date: "4 July 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+```{r}
+setwd("C:/Users/Python/Documents/GitHub/data_preprocessing_steps_R-Python")
+```
+
+## Reading_file
+```{r}
+dataframe = read.csv(file = "mtcars.csv" , header=TRUE , sep="," , stringsAsFactors = F ,  na.strings="NA" )   
+head(dataframe)
+```
+
+## Statistics for columns       
+```{r}
+summary(dataframe)
+```
+
+## Summary of dataframe   
+```{r}
+str(dataframe) 
+```
+
+## Column names   
+```{r}
+colnames(dataframe)
+```
+
+## Changing Index   
+```{r}
+rownames(dataframe) = dataframe$X 
+dataframe$X=NULL
+head(dataframe)
+```
+
+##  Checking columns  datatypes   
+```{r}
+sapply(dataframe, class)
+
+# For individual column check: is.numeric(dataframe$mpg)
+```
+
+## Changing the datatypes
+```{r}
+as.numeric(dataframe$mpg) 
+```
+
+## Finding missing values
+```{r}
+# There are many ways for this approach but the most efficient is 
+# using the colSums which is a built in dataframe function
+colSums(is.na(dataframe))
+sum(is.na(dataframe)) 
+```
+
+## Imputing Missing values  (Numeric) 
+```{r}
+library(DMwR) 
+df_imputed  = centralImputation(dataframe)
+sum(is.na(df_imputed))
+```
+
+##  Categorical  to Numeric     
+```{r}
+library(dummies)  
+
+# One way to figure out a categorical column is using bulitin str function.
+
+dummy_values_vs = dummy(dataframe$vs) 
+table(dummy_values_vs)
+```
+
+##  Scaling the Numerical Attribute (Range)     
+```{r}
+# Feature Scaling throws error when data has missing values
+# 'Range' method of feature scaling standardizes the values between 0 and 1
+library(vegan)
+dataframe_generalized = decostand(x = df_imputed[,                        
+                      c('mpg','disp','drat','wt','qsec','gear','carb')],
+                      method = "range",MARGIN = 2) 
+head(dataframe_generalized)
+```
+
+## Scaling the Numerical Attribute  (Standardize)  (Mean = 0, SD = 1)  
+```{r}
+# Standardization method calculates all the calues as z-statistic
+# Once this is done we can find outliers very easily
+dataframe_standardized = decostand(x =df_imputed[          
+                  ,c('mpg','disp','drat','wt','qsec','gear','carb')],
+                  method ="standardize",MARGIN = 2) 
+head(dataframe_standardized)
+```
+
